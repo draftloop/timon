@@ -65,7 +65,7 @@ Show active incidents and the health of all known probes and jobs.
 
 ```
 ACTIVE INCIDENTS (1)
-  INC-3  open  "Database unreachable"  2h ago
+  INC-3  open  "db.backup is critical"  1h ago
 
 PROBES & JOBS (3)
   myapp.health   ✓ healthy — 4m ago   "All good"
@@ -110,7 +110,8 @@ timon push probe <code> <healthy|warning|critical> [flags]
 | `--stale-incident-after <duration>` | Same as `--stale-after`, and also opens an incident |
 
 ```sh
-timon push probe myapp.health "All good" healthy \
+timon push probe myapp.health healthy \
+    --comment "All good" \
     --stale-after 5m \
     --stale-incident-after 15m
 ```
@@ -153,8 +154,8 @@ timon push job step <code:run-uid> <label> <healthy|warning|critical> [flags]
 
 | Flag | Description |
 |------|-------------|
-| `--end` | End the run after this step |
-| `--end-comment <text>` | Optional end comment (only with `--end`) |
+| `--end` | End the run after this step; the step label is used as end comment if `--end-comment` is not set |
+| `--end-comment <text>` | Override the end comment (only with `--end`) |
 
 ```sh
 timon push job step nightly.sync:$TIMON_JOB_RUN "Exported data" healthy
@@ -274,22 +275,23 @@ timon truncate --keep-incidents 180d                       # resolved incidents 
 
 Incidents are opened automatically based on the rules you set, or manually with `timon push incident`.
 
-| Trigger | Cause                                                                                          |
-|---------|------------------------------------------------------------------------------------------------|
-| `critical` | A probe push with health `critical`, or a job run that ended with at least one `critical` step |
-| `stale` | No push received before `--stale-incident-after` expires                                       |
-| `job_overtime` | A job run exceeds `--overtime-incident-after`                                                  |
-| `job_overlap` | A new run starts while one is already running                                                  |
-| `manual` | Created explicitly with `timon push incident`                                                  |
+| Trigger | Cause | Auto-generated title |
+|---------|-------|----------------------|
+| `critical` | A probe push with health `critical`, or a job run that ended with at least one `critical` step | `<code> is critical` |
+| `stale` | No push received before `--stale-incident-after` expires | `<code> is stale` |
+| `job_overtime` | A job run exceeds `--overtime-incident-after` | `<code> is overtime` |
+| `job_overlap` | A new run starts while one is already running | `<code> is overlapping` |
+| `manual` | Created explicitly with `timon push incident` | *(user-supplied)* |
 
 An incident transitions through the following states:
 
 ```
 open  ──(probe recovers)──►  recovered  ──(degrades again)──►  relapsed
-                                                  └────────────────────►  resolved
+  │                              │                                  │
+  └──────────────────────────────┴──────────(timon resolve)────────►  resolved
 ```
 
-Resolving an incident (`timon resolve`) is permanent. Recovered/relapsed transitions happen automatically as health reports come in.
+Resolving an incident (`timon resolve`) is permanent and can be done from any state. Recovered/relapsed transitions happen automatically as health reports come in.
 
 ---
 
@@ -322,7 +324,7 @@ ping_interval = "5m"              # send a timon.ping webhook event on this inte
 [[webhook]]
 on      = ["incident.open", "incident.relapsed"]
 url     = "https://gotify.internal/message?token=CHANGE_ME"
-cert    = "/usr/local/share/ca-certificates/extra/myca.crt"  # optional CA or client cert for mTLS
+cert    = "/usr/local/share/ca-certificates/extra/myca.crt"  # optional custom CA certificate to trust
 headers = { "X-My-Header" = "yes" }
 body    = """
 { "message": {{ if .incident.description }}{{ json .incident.description }}{{ else }}{{ json .incident.title }}{{ end }}, "title": {{ json .incident.title }}, "priority": 8 }
