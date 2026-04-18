@@ -290,6 +290,14 @@ var ShowCmd = &cobra.Command{
 				for _, step := range showResponse.Report.Steps {
 					fmt.Fprintf(w, "  +%s\t%s\t%q\n", utils.HumanDuration(step.At.Sub(*showResponse.Report.JobStartedAt)), statusIcon(step.Health)+" "+string(step.Health), step.Label)
 				}
+				if showResponse.Report.JobEndedAt != nil {
+					fmt.Fprintf(w, "  +%s\tend\t%s\n", utils.HumanDuration(showResponse.Report.JobEndedAt.Sub(*showResponse.Report.JobStartedAt)), func() string {
+						if showResponse.Report.JobEndComment != nil {
+							return fmt.Sprintf("%q", *showResponse.Report.JobEndComment)
+						}
+						return ""
+					}())
+				}
 				w.Flush()
 			}
 		}
