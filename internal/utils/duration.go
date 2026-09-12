@@ -12,7 +12,7 @@ var durationRegexp = regexp.MustCompile(`(\d+)(mo|[ywd])`)
 
 func ParseDuration(s string) (time.Duration, error) {
 	s = strings.ReplaceAll(s, " ", "")
-	units := map[string]int{"y": 365 * 24, "mo": 30 * 24, "w": 7 * 24, "d": 24}
+	units := map[string]int{"y": 365 * 24, "mo": 730, "w": 7 * 24, "d": 24}
 	converted := durationRegexp.ReplaceAllStringFunc(s, func(match string) string {
 		sub := durationRegexp.FindStringSubmatch(match)
 		val, _ := strconv.Atoi(sub[1])
@@ -34,7 +34,7 @@ func HumanDuration(d time.Duration) string {
 		symbol string
 	}{
 		{365 * 24 * time.Hour, "y"},
-		{30 * 24 * time.Hour, "mo"},
+		{730 * time.Hour, "mo"},
 		{7 * 24 * time.Hour, "w"},
 		{24 * time.Hour, "d"},
 		{time.Hour, "h"},

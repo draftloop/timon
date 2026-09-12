@@ -299,7 +299,7 @@ Config is loaded from the first file found among:
 - `~/.config/timon/timon.toml`
 - `/etc/timon/timon.toml`
 
-All settings are optional. Durations accept `ns`, `us`, `ms`, `s`, `m`, `h`, `d`, `w`, `mo`, `y`. Units above `h` are approximate (`d` = 24h, `w` = 168h, `mo` = 720h, `y` = 8760h); use `h` or smaller when precision matters.
+All settings are optional. Durations accept `ns`, `us`, `ms`, `s`, `m`, `h`, `d`, `w`, `mo`, `y`. Units above `h` are approximate (`d` = 24h, `w` = 168h, `mo` = 730h, `y` = 8760h); use `h` or smaller when precision matters.
 
 For local development, a minimal config is enough:
 
