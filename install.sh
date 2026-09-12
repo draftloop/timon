@@ -36,7 +36,7 @@ FILENAME="${BIN}_${OS}_${ARCH}"
 URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
 
 # Check installed version
-if command -v "$BIN" > /dev/null 2>&1; then
+if command -v "$INSTALL_DIR/$BIN" > /dev/null 2>&1; then
   INSTALLED=$(${BIN} version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
   if [ "$INSTALLED" = "$(echo "$VERSION" | tr -d 'v')" ]; then
     echo "$BIN $VERSION is already installed." && exit 0
@@ -54,7 +54,7 @@ if command -v "$BIN" > /dev/null 2>&1; then
 fi
 
 # Stop running timon if any
-if pgrep -x "$BIN" > /dev/null 2>&1; then
+if pgrep -x "$INSTALL_DIR/$BIN" > /dev/null 2>&1; then
   CURRENT_VERSION=$($BIN version 2>/dev/null || echo "unknown")
   printf "Timon is running (current: %s, installing: %s). Stop it before installing? [y/N] " "$CURRENT_VERSION" "$VERSION"
   read -r answer < /dev/tty
@@ -65,7 +65,7 @@ if pgrep -x "$BIN" > /dev/null 2>&1; then
       elif command -v systemctl > /dev/null 2>&1; then
         systemctl --user stop timon.service 2>/dev/null || true
       else
-        pkill -x "$BIN" || true
+        pkill -x "$INSTALL_DIR/$BIN" || true
       fi
       echo "Timon stopped."
       ;;
