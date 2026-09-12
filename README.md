@@ -31,7 +31,7 @@ go build -o timon .
 timon daemon
 ```
 
-The daemon reads its configuration from `~/.config/timon/timon.toml` or `/etc/timon/timon.toml`. It starts with sensible defaults if no config file is found.
+The daemon reads its configuration from `./timon.toml`, `~/.config/timon/timon.toml` or `/etc/timon/timon.toml`. It starts with sensible defaults if no config file is found.
 
 **2. Push your first probe**
 
@@ -296,6 +296,7 @@ Resolving an incident (`timon resolve`) is permanent and can be done from any st
 
 Config is loaded from the first file found among:
 
+- `./timon.toml`
 - `~/.config/timon/timon.toml`
 - `/etc/timon/timon.toml`
 
