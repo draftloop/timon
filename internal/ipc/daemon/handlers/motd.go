@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"github.com/draftloop/elm"
 	database "timon/internal/daemon/db"
 	"timon/internal/daemon/models"
 	"timon/internal/enums"
 	"timon/internal/ipc/daemon/handler"
 	"timon/internal/ipc/dto"
+
+	"github.com/draftloop/elm"
 )
 
-func SummaryHandler(req dto.SummaryRequest) (res handler.Response[dto.SummaryResponse]) {
+func MotdHandler(req dto.MotdRequest) (res handler.Response[dto.MotdResponse]) {
 	db := database.GetDB()
 
 	var nbActiveIncidents int
@@ -78,7 +79,7 @@ func SummaryHandler(req dto.SummaryRequest) (res handler.Response[dto.SummaryRes
 		return res.SendDaemonError(err)
 	}
 
-	return res.Send(dto.SummaryResponse{
+	return res.Send(dto.MotdResponse{
 		ActiveIncidents:    nbActiveIncidents,
 		CriticalContracts:  criticalContracts,
 		StaleContracts:     staleContracts,

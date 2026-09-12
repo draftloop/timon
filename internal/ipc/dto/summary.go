@@ -1,8 +1,8 @@
 package dto
 
-type SummaryRequest struct{}
+type MotdRequest struct{}
 
-type SummaryResponse struct {
+type MotdResponse struct {
 	ActiveIncidents    int
 	CriticalContracts  []string
 	StaleContracts     []string

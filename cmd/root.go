@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"os"
 	"timon/cmd/push"
 	"timon/internal/log"
+
+	"github.com/spf13/cobra"
 )
 
 var RootCmd = &cobra.Command{
@@ -34,7 +35,7 @@ func init() {
 	RootCmd.AddCommand(ResolveCmd)
 	RootCmd.AddCommand(ShowCmd)
 	RootCmd.AddCommand(StatusCmd)
-	RootCmd.AddCommand(SummaryCmd)
+	RootCmd.AddCommand(MotdCmd)
 	RootCmd.AddCommand(TruncateCmd)
 }
 

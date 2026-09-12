@@ -118,7 +118,7 @@ func CreateServer(socketPath string, onReady func()) error {
 	addHandler(handlers.DeleteHandler, dto.DeleteRequest{}, dto.DeleteResponse{})
 	addHandler(handlers.AnnotateHandler, dto.AnnotateRequest{}, dto.AnnotateResponse{})
 	addHandler(handlers.ResolveHandler, dto.ResolveRequest{}, dto.ResolveResponse{})
-	addHandler(handlers.SummaryHandler, dto.SummaryRequest{}, dto.SummaryResponse{})
+	addHandler(handlers.MotdHandler, dto.MotdRequest{}, dto.MotdResponse{})
 	addHandler(handlers.StatusHandler, dto.StatusRequest{}, dto.StatusResponse{})
 	addHandler(handlers.TruncateHandler, dto.TruncateRequest{}, dto.TruncateResponse{})
 

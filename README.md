@@ -81,16 +81,13 @@ watch -n2 timon status
 
 ---
 
-### `timon summary`
+### `timon motd`
 
-Print a one-line health summary. Useful for shell prompts or status bars.
+Print a concise health overview. Useful for shell prompts or status bars.
 
 ```sh
-timon summary
+timon motd
 # Timon — 1 active incidents · 1 critical (db.backup) · 0 stale · 0 warning · 2 healthy · 0 running jobs
-
-timon summary --short
-# Timon — 1 active incidents · 1 critical · 0 stale · 0 warning · 2 healthy · 0 running jobs
 ```
 
 ---
@@ -103,11 +100,11 @@ Push a health report for a probe. Creates the probe automatically on first push.
 timon push probe <code> <healthy|warning|critical> [flags]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--comment <text>` | Optional comment attached to this sample |
-| `--stale-after <duration>` | Flag the probe as stale if no push arrives within this delay |
-| `--stale-incident-after <duration>` | Same as `--stale-after`, and also opens an incident |
+| Flag                                | Description                                                  |
+|-------------------------------------|--------------------------------------------------------------|
+| `--comment <text>`                  | Optional comment attached to this sample                     |
+| `--stale-after <duration>`          | Flag the probe as stale if no push arrives within this delay |
+| `--stale-incident-after <duration>` | Same as `--stale-after`, and also opens an incident          |
 
 ```sh
 timon push probe myapp.health healthy \
@@ -126,13 +123,13 @@ Start a new job run. Prints the run UID, which must be passed to subsequent `ste
 timon push job start <code> [flags]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--comment <text>` | Optional start comment |
-| `--stale-after <duration>` | Flag the job as stale if no push arrives within this delay after it ends |
-| `--stale-incident-after <duration>` | Same as `--stale-after`, and also opens an incident |
-| `--overtime-incident-after <duration>` | Open an incident if the job runs longer than this delay |
-| `--overlap-incident` | Open an incident if a new run starts while one is already running (default: true) |
+| Flag                                   | Description                                                                       |
+|----------------------------------------|-----------------------------------------------------------------------------------|
+| `--comment <text>`                     | Optional start comment                                                            |
+| `--stale-after <duration>`             | Flag the job as stale if no push arrives within this delay after it ends          |
+| `--stale-incident-after <duration>`    | Same as `--stale-after`, and also opens an incident                               |
+| `--overtime-incident-after <duration>` | Open an incident if the job runs longer than this delay                           |
+| `--overlap-incident`                   | Open an incident if a new run starts while one is already running (default: true) |
 
 ```sh
 TIMON_JOB_RUN=$(timon push job start nightly.sync \
@@ -152,10 +149,10 @@ Push a step to an ongoing job run. The run UID is passed directly in the code ar
 timon push job step <code:run-uid> <label> <healthy|warning|critical> [flags]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--end` | End the run after this step; the step label is used as end comment if `--end-comment` is not set |
-| `--end-comment <text>` | Override the end comment (only with `--end`) |
+| Flag                   | Description                                                                                      |
+|------------------------|--------------------------------------------------------------------------------------------------|
+| `--end`                | End the run after this step; the step label is used as end comment if `--end-comment` is not set |
+| `--end-comment <text>` | Override the end comment (only with `--end`)                                                     |
 
 ```sh
 timon push job step nightly.sync:$TIMON_JOB_RUN "Exported data" healthy
@@ -246,14 +243,14 @@ Bulk-delete old samples, runs, and resolved incidents based on retention duratio
 timon truncate [<code>] [--keep <duration>] [--keep-healthy <d>] [--keep-warning <d>] [--keep-critical <d>] [--keep-incidents <d>]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `<code>` | Optional probe or job code — restrict the truncation to this probe or job |
-| `--keep <duration>` | Delete samples and runs older than this duration (shorthand for all three health flags) |
-| `--keep-healthy <duration>` | Retention duration for healthy samples and runs |
-| `--keep-warning <duration>` | Retention duration for warning samples and runs |
-| `--keep-critical <duration>` | Retention duration for critical samples and runs |
-| `--keep-incidents <duration>` | Delete resolved incidents older than this duration |
+| Flag                          | Description                                                                             |
+|-------------------------------|-----------------------------------------------------------------------------------------|
+| `<code>`                      | Optional probe or job code — restrict the truncation to this probe or job               |
+| `--keep <duration>`           | Delete samples and runs older than this duration (shorthand for all three health flags) |
+| `--keep-healthy <duration>`   | Retention duration for healthy samples and runs                                         |
+| `--keep-warning <duration>`   | Retention duration for warning samples and runs                                         |
+| `--keep-critical <duration>`  | Retention duration for critical samples and runs                                        |
+| `--keep-incidents <duration>` | Delete resolved incidents older than this duration                                      |
 
 `--keep` is mutually exclusive with `--keep-healthy`, `--keep-warning`, and `--keep-critical`. At least one flag is required.
 
@@ -275,13 +272,13 @@ timon truncate --keep-incidents 180d                       # resolved incidents 
 
 Incidents are opened automatically based on the rules you set, or manually with `timon push incident`.
 
-| Trigger | Cause | Auto-generated title |
-|---------|-------|----------------------|
-| `critical` | A probe push with health `critical`, or a job run that ended with at least one `critical` step | `<code> is critical` |
-| `stale` | No push received before `--stale-incident-after` expires | `<code> is stale` |
-| `job_overtime` | A job run exceeds `--overtime-incident-after` | `<code> is overtime` |
-| `job_overlap` | A new run starts while one is already running | `<code> is overlapping` |
-| `manual` | Created explicitly with `timon push incident` | *(user-supplied)* |
+| Trigger        | Cause                                                                                          | Auto-generated title    |
+|----------------|------------------------------------------------------------------------------------------------|-------------------------|
+| `critical`     | A probe push with health `critical`, or a job run that ended with at least one `critical` step | `<code> is critical`    |
+| `stale`        | No push received before `--stale-incident-after` expires                                       | `<code> is stale`       |
+| `job_overtime` | A job run exceeds `--overtime-incident-after`                                                  | `<code> is overtime`    |
+| `job_overlap`  | A new run starts while one is already running                                                  | `<code> is overlapping` |
+| `manual`       | Created explicitly with `timon push incident`                                                  | *(user-supplied)*       |
 
 An incident transitions through the following states:
 
@@ -298,6 +295,7 @@ Resolving an incident (`timon resolve`) is permanent and can be done from any st
 ## Configuration
 
 Config is loaded from the first file found among:
+
 - `~/.config/timon/timon.toml`
 - `/etc/timon/timon.toml`
 
@@ -307,7 +305,7 @@ For local development, a minimal config is enough:
 
 ```toml
 [daemon]
-data_dir  = "/tmp/timon/"
+data_dir = "/tmp/timon/"
 log_level = "debug"
 ```
 
@@ -315,50 +313,50 @@ Full reference:
 
 ```toml
 [daemon]
-hostname      = "prod-server-1"   # used in webhooks; defaults to machine hostname
-data_dir      = "/etc/timon/"     # SQLite database location; defaults to /etc/timon/
-log_dir       = "/var/log/timon/" # log file location when installed as a service; logs go to stdout otherwise
-log_level     = "info"            # silent | fatal | error | warn | info | debug
+hostname = "prod-server-1"   # used in webhooks; defaults to machine hostname
+data_dir = "/etc/timon/"     # SQLite database location; defaults to /etc/timon/
+log_dir = "/var/log/timon/" # log file location when installed as a service; logs go to stdout otherwise
+log_level = "info"            # silent | fatal | error | warn | info | debug
 ping_interval = "5m"              # send a timon.ping webhook event on this interval
 
 [[webhook]]
-on      = ["incident.open", "incident.relapsed"]
-url     = "https://gotify.internal/message?token=CHANGE_ME"
-cert    = "/usr/local/share/ca-certificates/extra/myca.crt"  # optional custom CA certificate to trust
+on = ["incident.open", "incident.relapsed"]
+url = "https://gotify.internal/message?token=CHANGE_ME"
+cert = "/usr/local/share/ca-certificates/extra/myca.crt"  # optional custom CA certificate to trust
 headers = { "X-My-Header" = "yes" }
-body    = """
+body = """
 { "message": {{ if .incident.description }}{{ json .incident.description }}{{ else }}{{ json .incident.title }}{{ end }}, "title": {{ json .incident.title }}, "priority": 8 }
 """
 
 [webhook.retry]
 attempts = 3     # retries after the initial attempt (0 = no retry); defaults to 5
-timeout  = "10s" # per-request timeout
-delay    = "5s"  # delay between attempts
+timeout = "10s" # per-request timeout
+delay = "5s"  # delay between attempts
 ```
 
 ### Webhook events
 
-| Event | Description |
-|-------|-------------|
-| `incident.open` | An incident was opened |
-| `incident.recovered` | An incident recovered |
-| `incident.relapsed` | A recovered incident relapsed |
-| `incident.resolved` | An incident was manually resolved |
-| `incident.annotated` | An annotation was added to an incident |
-| `timon.ping` | Periodic heartbeat (requires `ping_interval`) |
-| `timon.started` | The daemon started |
+| Event                | Description                                   |
+|----------------------|-----------------------------------------------|
+| `incident.open`      | An incident was opened                        |
+| `incident.recovered` | An incident recovered                         |
+| `incident.relapsed`  | A recovered incident relapsed                 |
+| `incident.resolved`  | An incident was manually resolved             |
+| `incident.annotated` | An annotation was added to an incident        |
+| `timon.ping`         | Periodic heartbeat (requires `ping_interval`) |
+| `timon.started`      | The daemon started                            |
 
 ### Webhook template
 
 The body is a [Go template](https://pkg.go.dev/text/template). The following variables are always available, plus additional ones depending on the event:
 
-| Variable / Function      | Description |
-|--------------------------|-------------|
-| `._hostname`             | Daemon hostname |
+| Variable / Function      | Description                       |
+|--------------------------|-----------------------------------|
+| `._hostname`             | Daemon hostname                   |
 | `._event`                | Event name (e.g. `incident.open`) |
-| `._timestamp`            | RFC3339 timestamp of the event |
-| `{{ json .value }}`      | Encode a value as a JSON string |
-| `{{ urlencode .value }}` | URL-encode a string |
+| `._timestamp`            | RFC3339 timestamp of the event    |
+| `{{ json .value }}`      | Encode a value as a JSON string   |
+| `{{ urlencode .value }}` | URL-encode a string               |
 
 ---
 

@@ -2,19 +2,18 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"strings"
 	ipc "timon/internal/ipc/client"
 	"timon/internal/ipc/dto"
 	"timon/internal/log"
+
+	"github.com/spf13/cobra"
 )
 
-var SummaryCmd = &cobra.Command{
-	Use:   "summary",
-	Short: "Print a one-line health summary.",
+var MotdCmd = &cobra.Command{
+	Use:   "motd",
+	Short: "Print a concise health overview.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		short, _ := cmd.Flags().GetBool("short")
-
 		cmd.SilenceUsage = true
 
 		conn, err := ipc.Connect()
@@ -23,7 +22,7 @@ var SummaryCmd = &cobra.Command{
 		}
 		defer conn.Close()
 
-		summaryResponse, err := ipc.Send[dto.SummaryRequest, dto.SummaryResponse](conn, dto.SummaryRequest{})
+		motdResponse, err := ipc.Send[dto.MotdRequest, dto.MotdResponse](conn, dto.MotdRequest{})
 		if err != nil {
 			return log.Client.Errorf("response error: %s", err)
 		}
@@ -36,30 +35,26 @@ var SummaryCmd = &cobra.Command{
 		}
 
 		fmt.Printf("Timon — %d active incidents · %d critical%s · %d stale%s · %d warning · %d healthy · %d running jobs\n",
-			summaryResponse.ActiveIncidents,
-			len(summaryResponse.CriticalContracts),
+			motdResponse.ActiveIncidents,
+			len(motdResponse.CriticalContracts),
 			func() string {
-				if short || len(summaryResponse.CriticalContracts) == 0 {
+				if len(motdResponse.CriticalContracts) == 0 {
 					return ""
 				}
-				return " (" + formatCodes(summaryResponse.CriticalContracts) + ")"
+				return " (" + formatCodes(motdResponse.CriticalContracts) + ")"
 			}(),
-			len(summaryResponse.StaleContracts),
+			len(motdResponse.StaleContracts),
 			func() string {
-				if short || len(summaryResponse.StaleContracts) == 0 {
+				if len(motdResponse.StaleContracts) == 0 {
 					return ""
 				}
-				return " (" + formatCodes(summaryResponse.StaleContracts) + ")"
+				return " (" + formatCodes(motdResponse.StaleContracts) + ")"
 			}(),
-			summaryResponse.NbWarningContracts,
-			summaryResponse.NbHealthyContracts,
-			summaryResponse.NbRunningJobs,
+			motdResponse.NbWarningContracts,
+			motdResponse.NbHealthyContracts,
+			motdResponse.NbRunningJobs,
 		)
 
 		return nil
 	},
-}
-
-func init() {
-	SummaryCmd.Flags().Bool("short", false, "Short summary")
 }
