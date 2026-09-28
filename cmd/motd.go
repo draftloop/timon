@@ -34,26 +34,29 @@ var MotdCmd = &cobra.Command{
 			return strings.Join(codes[:3], ", ") + fmt.Sprintf(" +%d", len(codes)-3)
 		}
 
-		fmt.Printf("Timon — %d active incidents · %d critical%s · %d stale%s · %d warning · %d healthy · %d running jobs\n",
-			motdResponse.ActiveIncidents,
-			len(motdResponse.CriticalContracts),
-			func() string {
-				if len(motdResponse.CriticalContracts) == 0 {
-					return ""
-				}
-				return " (" + formatCodes(motdResponse.CriticalContracts) + ")"
-			}(),
-			len(motdResponse.StaleContracts),
-			func() string {
-				if len(motdResponse.StaleContracts) == 0 {
-					return ""
-				}
-				return " (" + formatCodes(motdResponse.StaleContracts) + ")"
-			}(),
-			motdResponse.NbWarningContracts,
-			motdResponse.NbHealthyContracts,
-			motdResponse.NbRunningJobs,
-		)
+		parts := []string{
+			fmt.Sprintf("%d active incidents", motdResponse.ActiveIncidents),
+		}
+
+		if n := len(motdResponse.CriticalContracts); n > 0 {
+			parts = append(parts, fmt.Sprintf("%d critical (%s)", n, formatCodes(motdResponse.CriticalContracts)))
+		}
+
+		if n := len(motdResponse.StaleContracts); n > 0 {
+			parts = append(parts, fmt.Sprintf("%d stale (%s)", n, formatCodes(motdResponse.StaleContracts)))
+		}
+
+		if n := motdResponse.NbWarningContracts; n > 0 {
+			parts = append(parts, fmt.Sprintf("%d warning", n))
+		}
+
+		if n := motdResponse.NbHealthyContracts; n > 0 {
+			parts = append(parts, fmt.Sprintf("%d healthy", n))
+		}
+
+		parts = append(parts, fmt.Sprintf("%d running jobs", motdResponse.NbRunningJobs))
+
+		fmt.Printf("Timon — %s\n", strings.Join(parts, " · "))
 
 		return nil
 	},
