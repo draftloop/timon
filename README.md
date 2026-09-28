@@ -51,10 +51,6 @@ timon status
 
 Start the daemon. Reads config, opens the Unix socket, and starts background tasks.
 
-```sh
-timon daemon
-```
-
 > For quick testing, running `timon daemon` in a terminal is enough. For production use, set it up as a system service via the install script.
 
 ---
@@ -83,11 +79,15 @@ watch -n2 timon status
 
 ### `timon motd`
 
-Print a concise health overview. Useful for shell prompts or status bars.
+Print a concise health overview. Health status with a count of `0` are omitted.
 
-```sh
-timon motd
-# Timon — 1 active incidents · 1 critical (db.backup) · 0 stale · 0 warning · 2 healthy · 0 running jobs
+Examples:
+
+```text
+Timon — 1 active incidents · 1 critical (db.backup) · 2 healthy · 0 running jobs
+Timon — 0 active incidents · 1 stale (api.latency) · 3 healthy · 1 running jobs
+Timon — 6 active incidents · 5 critical (db.backup, api.latency, disk.full +2) · 2 healthy · 0 running jobs
+Timon — 1 active incident · 1 warning · 4 healthy · 2 running jobs
 ```
 
 ---
